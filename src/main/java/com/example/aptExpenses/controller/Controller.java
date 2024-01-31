@@ -1,16 +1,34 @@
 package com.example.aptExpenses.controller;
+import com.example.aptExpenses.Util.Util;
+import com.example.aptExpenses.service.SqlService;
+
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController  
 public class Controller {
 
-    // autowire service class
+    // lookup java 17 features
 
-@RequestMapping("/")  
-public String homePage() {
+    //@Autowired
+    private SqlService sqlService = new SqlService();
+    private Util util = new Util();
+
+@GetMapping("/")  
+public ResponseEntity<String> homePage() {
     // Have dropdown pre-populated with markets in database for Update Apt and Market expenses option
-    return "Welcome to the home page where you will see options to 1. Create Apt \n 2. Update Apt \n 3. Generate Market Level Expense Report";  
+    ArrayList<String> markets = sqlService.getAllMarkets();
+    return ResponseEntity
+            .status(HttpStatus.OK)
+            .header("Custom-Header", "Successfully loaded market names")
+            .body("Welcome to the home page where you will see options to 1. Create Apt \n 2. Update Apt \n 3. Generate Market Level Expense Report\n" + util.concatArrayListString(markets)); 
 }
 
 @RequestMapping("/createProperty")  
@@ -41,8 +59,7 @@ public String updateProperty() {
 }
 
 @RequestMapping("/marketExpenses")  
-public String marketExpenses() {
-    // Need input parameter = String marketName
+public String marketExpenses(@RequestParam String marketName) {
     // Queries db
     // Returns data 
     return "Welcome to the marketExpenses page where you will see the average expenses and per door cost of apartment buildings in this market";  
